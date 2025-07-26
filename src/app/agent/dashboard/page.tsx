@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -47,7 +49,15 @@ export default async function AgentDashboard() {
           <h1 className="text-2xl font-bold">Agent Dashboard</h1>
           <p className="text-gray-500">Welcome, {user.email}</p>
         </div>
-        <SignOutButton />
+        <div className="flex items-center gap-4">
+          <Link href="/agent/validated-quotes">
+            <Button variant="outline">Validated Quotes</Button>
+          </Link>
+          <Link href="/agent/settings">
+            <Button variant="ghost">Settings</Button>
+          </Link>
+          <SignOutButton />
+        </div>
       </header>
 
       <Card>
@@ -57,7 +67,7 @@ export default async function AgentDashboard() {
             <TableHeader>
               <TableRow>
                 <TableHead>Product</TableHead>
-                <TableHead>Client Details</TableHead> {/* <-- New Column */}
+                <TableHead>Client Details</TableHead>
                 <TableHead>Company</TableHead>
                 <TableHead>Quantity</TableHead>
                 <TableHead>Actions</TableHead>
@@ -70,8 +80,8 @@ export default async function AgentDashboard() {
                     <Image src={request.photo_url} alt={request.nom_produit} width={40} height={40} className="rounded-md object-cover"/>
                     {request.nom_produit}
                   </TableCell>
-                  <TableCell>{request.details}</TableCell> {/* <-- New Column */}
-                  <TableCell>{request.quote_groups?.entreprises?.nom_entreprise}</TableCell>
+                  <TableCell>{request.details}</TableCell>
+                  <TableCell>{(request.quote_groups as any)?.entreprises?.nom_entreprise}</TableCell>
                   <TableCell>{request.quantite}</TableCell>
                   <TableCell className="flex gap-2">
                     <AddOfferDialog agentId={user.id} quoteRequestId={request.id} quantity={request.quantite} />
