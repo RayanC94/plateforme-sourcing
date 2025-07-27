@@ -25,7 +25,7 @@ export default function DownloadInvoiceButton({ invoiceId, invoiceNumber }: { in
       return;
     }
 
-    const blob = new Blob([data], { type: 'application/pdf' });
+    const blob = data instanceof Blob ? data : new Blob([data], { type: 'application/pdf' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

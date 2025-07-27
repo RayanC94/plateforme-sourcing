@@ -1,40 +1,34 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
-
-serve(async (req) => {
+serve(async (req)=>{
+  // This handles CORS preflight requests.
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', {
+      headers: corsHeaders
+    });
   }
-
   try {
     const { invoiceId } = await req.json();
     const authHeader = req.headers.get('Authorization');
-    
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: authHeader! },
-        },
+    // Initialize the Supabase client with the user's authorization header.
+    const supabase = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
+      global: {
+        headers: {
+          Authorization: authHeader
+        }
       }
-    );
-
-    const { data: invoice, error } = await supabase
-      .from('invoices')
-      .select(`*, seller_profiles(*), quote_groups(*, entreprises(*), quote_requests(*, supplier_offers(*)))`)
-      .eq('id', invoiceId)
-      .single();
-
+    });
+    // Fetch the invoice data along with related seller, buyer, and quote details.
+    const { data: invoice, error } = await supabase.from('invoices').select(`*, seller_profiles(*), quote_groups(*, entreprises(*), quote_requests(*, supplier_offers(*)))`).eq('id', invoiceId).single();
     if (error) throw error;
     if (!invoice) throw new Error('Invoice not found');
-    
+    // Destructure data for easier access in the HTML template.
     const seller = invoice.seller_profiles;
     const quoteGroup = invoice.quote_groups;
     const buyer = quoteGroup?.entreprises;
     const requests = quoteGroup?.quote_requests || [];
-
+    // Generate the HTML content for the invoice.
     const html = `
       <!DOCTYPE html>
       <html>
@@ -59,14 +53,15 @@ serve(async (req) => {
           <table>
             <thead><tr><th>Product</th><th>Specification</th><th>Qty</th><th class="text-right">Unit Price</th><th class="text-right">Total</th></tr></thead>
             <tbody>
-              ${requests.map((req) => {
-                const offer = req.supplier_offers?.[0];
-                if (!offer) return '';
-                const unitPrice = offer.exchange_rate && offer.exchange_rate > 0 ? (offer.prix_unitaire_rmb || 0) / offer.exchange_rate : 0;
-                const total = unitPrice * req.quantite;
-                const currency = offer.client_currency || '';
-                return `<tr><td>${req.nom_produit || 'N/A'}</td><td>${offer.product_specification || ''}</td><td>${req.quantite || 0}</td><td class="text-right">${unitPrice.toFixed(2)} ${currency}</td><td class="text-right">${total.toFixed(2)} ${currency}</td></tr>`;
-              }).join('')}
+              ${requests.map((req)=>{
+      const offer = req.supplier_offers?.[0];
+      if (!offer) return '';
+      // Calculate unit price based on exchange rate if available.
+      const unitPrice = offer.exchange_rate && offer.exchange_rate > 0 ? (offer.prix_unitaire_rmb || 0) / offer.exchange_rate : 0;
+      const total = unitPrice * (req.quantite || 0);
+      const currency = offer.client_currency || '';
+      return `<tr><td>${req.nom_produit || 'N/A'}</td><td>${offer.product_specification || ''}</td><td>${req.quantite || 0}</td><td class="text-right">${unitPrice.toFixed(2)} ${currency}</td><td class="text-right">${total.toFixed(2)} ${currency}</td></tr>`;
+    }).join('')}
             </tbody>
           </table>
           <div class="total-section">
@@ -84,38 +79,52 @@ serve(async (req) => {
         </body>
       </html>
     `;
-    
+    // Use Browserless.io service to convert the generated HTML to a PDF.
     const browserlessApiKey = Deno.env.get('BROWSERLESS_API_KEY');
     if (!browserlessApiKey) throw new Error('Browserless API key not found.');
-    
     const pdfResponse = await fetch(`https://production-sfo.browserless.io/pdf?token=${browserlessApiKey}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         html: html,
-        options: { format: 'A4', printBackground: true, margin: { top: '40px', right: '20px', bottom: '20px', left: '20px' } }
+        options: {
+          format: 'A4',
+          printBackground: true,
+          margin: {
+            top: '40px',
+            right: '20px',
+            bottom: '20px',
+            left: '20px'
+          }
+        }
       })
     });
-
     if (!pdfResponse.ok) {
       const errorBody = await pdfResponse.text();
       throw new Error(`Browserless API failed with status ${pdfResponse.status}: ${errorBody}`);
     }
-
     const pdfBuffer = await pdfResponse.arrayBuffer();
-
+    // Return the generated PDF as a downloadable file.
     return new Response(pdfBuffer, {
-      headers: { ...corsHeaders, 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="${invoice.numero_facture || 'invoice'}.pdf"` },
-      status: 200,
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/octet-stream',
+        'Content-Disposition': `attachment; filename="${invoice.numero_facture || 'invoice'}.pdf"`
+      },
+      status: 200
     });
-
   } catch (error) {
     console.error('❌ Function error:', error);
     return new Response(JSON.stringify({
       error: error.message,
-      stack: error.stack, // Include the full error stack in the response
+      stack: error.stack
     }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'application/json'
+      },
       status: 400
     });
   }
