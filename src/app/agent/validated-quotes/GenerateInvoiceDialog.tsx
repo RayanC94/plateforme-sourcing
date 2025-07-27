@@ -27,7 +27,6 @@ export default function GenerateInvoiceDialog({ groupId, totalAmount }: Generate
   const router = useRouter();
 
   useEffect(() => {
-    // Fetch seller profiles when the dialog is about to open
     if (open) {
       const fetchProfiles = async () => {
         const { data } = await supabase.from('seller_profiles').select('id, company_name');
@@ -51,7 +50,7 @@ export default function GenerateInvoiceDialog({ groupId, totalAmount }: Generate
 
     const { error: insertError } = await supabase.from('invoices').insert({
       id_groupe_devis: groupId,
-      id_seller_profile: selectedProfileId, // <-- Add the selected profile ID
+      id_seller_profile: selectedProfileId,
       numero_facture: invoiceNumber,
       montant_total: totalAmount,
       date_emission: today.toISOString(),

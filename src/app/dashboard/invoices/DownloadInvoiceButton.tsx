@@ -16,7 +16,11 @@ export default function DownloadInvoiceButton({ invoiceId, invoiceNumber }: { in
     });
 
     if (error) {
-      alert(`Error generating PDF: ${error.message}`);
+      // Get the detailed error from the function's response
+      const errorDetails = await error.context.json();
+      console.error("Function Error Details:", errorDetails);
+      // Display the full error in an alert
+      alert(`Function Crashed:\n\n${errorDetails.stack}`);
       setIsLoading(false);
       return;
     }
@@ -30,7 +34,7 @@ export default function DownloadInvoiceButton({ invoiceId, invoiceNumber }: { in
     a.click();
     a.remove();
     window.URL.revokeObjectURL(url);
-
+    
     setIsLoading(false);
   };
 

@@ -22,8 +22,6 @@ export default async function ValidatedQuotesPage() {
     redirect('/login');
   }
 
-  // --- START OF CORRECTION ---
-  // We must fetch the role from the 'profiles' table
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
@@ -33,7 +31,6 @@ export default async function ValidatedQuotesPage() {
   if (!profile || profile.role !== 'agent') {
     redirect('/login');
   }
-  // --- END OF CORRECTION ---
 
   const { data: quoteGroups, error } = await supabase
     .from('quote_groups')
@@ -46,7 +43,8 @@ export default async function ValidatedQuotesPage() {
         quantite,
         supplier_offers (
           prix_unitaire_rmb,
-          exchange_rate
+          exchange_rate,
+          client_currency
         )
       )
     `)
@@ -63,7 +61,11 @@ export default async function ValidatedQuotesPage() {
         </div>
         <div className="flex items-center gap-4">
           <Link href="/agent/dashboard">
-            <Button variant="outline">Back to Dashboard</Button>
+            <Button variant="outline">Dashboard</Button>
+          </Link>
+          {/* LIEN AJOUTÉ */}
+          <Link href="/agent/invoices">
+            <Button variant="outline">Invoices</Button>
           </Link>
           <SignOutButton />
         </div>
@@ -82,9 +84,11 @@ export default async function ValidatedQuotesPage() {
             </TableHeader>
             <TableBody>
               {quoteGroups?.map(group => {
+                let currency = 'EUR';
                 const subtotal = group.quote_requests.reduce((acc, req) => {
                   const offer = req.supplier_offers?.[0];
-                  if (offer && offer.exchange_rate > 0) {
+                  if (offer && offer.exchange_rate && offer.exchange_rate > 0) {
+                    if(offer.client_currency) currency = offer.client_currency;
                     return acc + (req.quantite * (offer.prix_unitaire_rmb || 0)) / offer.exchange_rate;
                   }
                   return acc;
@@ -94,7 +98,7 @@ export default async function ValidatedQuotesPage() {
                 return (
                   <TableRow key={group.id}>
                     <TableCell>{group.nom_groupe}</TableCell>
-                    <TableCell>${totalAmount.toFixed(2)}</TableCell>
+                    <TableCell>{totalAmount.toFixed(2)} {currency}</TableCell>
                     <TableCell>
                       <GenerateInvoiceDialog groupId={group.id} totalAmount={totalAmount} />
                     </TableCell>
