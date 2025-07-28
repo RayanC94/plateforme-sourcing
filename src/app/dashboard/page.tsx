@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import EntreprisesManager from './EntreprisesManager';
+import ProjectsManager from './ProjectsManager';
 
 export default async function Dashboard() {
   const supabase = createClient();
@@ -9,15 +9,30 @@ export default async function Dashboard() {
 
   const { data: entreprises } = await supabase
     .from('entreprises')
-    .select('id, nom_entreprise')
+    .select('id, nom_entreprise, address, country, business_registration')
     .eq('id_client_session', user.id);
 
-  const session = { user }; 
+  const { data: projects } = await supabase
+    .from('quote_groups')
+    .select('id, nom_groupe, entreprises!inner ( nom_entreprise )') // Utilise ! pour forcer la jointure
+    .eq('id_client_session', user.id)
+    .order('created_at', { ascending: false });
+
+  const normalizedProjects = (projects || []).map((p) => ({
+    ...p,
+    entreprises: p.entreprises?.[0] || { nom_entreprise: 'Inconnu' } // on extrait le premier élément
+  }));
+
+  const session = { user };
 
   return (
     <div>
       <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
-      <EntreprisesManager entreprises={entreprises || []} session={session} />
+      <ProjectsManager
+        entreprises={entreprises || []}
+        projects={normalizedProjects}
+        session={session}
+      />
     </div>
   );
 }

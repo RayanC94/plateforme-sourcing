@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Define types for the data we receive
 type Offer = { prix_unitaire_rmb: number; exchange_rate: number; client_currency: string; };
@@ -22,6 +23,8 @@ interface QuoteSummaryProps {
 export default function QuoteSummary({ requests, groupId, groupStatus }: QuoteSummaryProps) {
   const [formulas, setFormulas] = useState<Formula[]>([]);
   const [selectedShippingId, setSelectedShippingId] = useState<string | null>(null);
+  const [companies, setCompanies] = useState<{ id: string; nom_entreprise: string }[]>([]);
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
   const supabase = createClientComponentClient();
   const router = useRouter();
 
@@ -31,6 +34,17 @@ export default function QuoteSummary({ requests, groupId, groupStatus }: QuoteSu
       if (data) setFormulas(data);
     };
     fetchFormulas();
+
+    const fetchCompanies = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: entreprises } = await supabase
+        .from('entreprises')
+        .select('id, nom_entreprise')
+        .eq('id_client_session', user.id);
+      if (entreprises) setCompanies(entreprises);
+    };
+    fetchCompanies();
   }, [supabase]);
 
   const { subtotal, totalWeight, totalVolume, clientCurrency } = useMemo(() => {
@@ -65,6 +79,11 @@ export default function QuoteSummary({ requests, groupId, groupStatus }: QuoteSu
       alert("Please select a shipping method.");
       return;
     }
+    if (!selectedCompanyId) {
+      alert("Please select a billing company.");
+      return;
+    }
+
     const selectedOption = shippingOptions.find(opt => opt.id === selectedShippingId);
     if (!selectedOption) return;
 
@@ -74,9 +93,10 @@ export default function QuoteSummary({ requests, groupId, groupStatus }: QuoteSu
         status: 'Validé',
         methode_transport_choisie: selectedOption.methode,
         cout_transport_estime: selectedOption.cost,
+        billing_company_id: selectedCompanyId,
       })
       .eq('id', groupId);
-    
+
     if (error) {
       alert(`Error validating quote: ${error.message}`);
     } else {
@@ -121,11 +141,26 @@ export default function QuoteSummary({ requests, groupId, groupStatus }: QuoteSu
             ))}
           </RadioGroup>
         </div>
+        <div>
+          <Label>Select Billing Company:</Label>
+          <Select onValueChange={setSelectedCompanyId}>
+            <SelectTrigger id="billing-company" className="mt-2">
+              <SelectValue placeholder="Select a company..." />
+            </SelectTrigger>
+            <SelectContent>
+              {companies.map(company => (
+                <SelectItem key={company.id} value={company.id}>
+                  {company.nom_entreprise}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <div className="flex justify-between text-xl font-bold border-t pt-4">
           <span>Grand Total</span>
           <span>{grandTotal.toFixed(2)} {clientCurrency}</span>
         </div>
-        <Button onClick={handleValidate} disabled={!selectedShippingId} className="w-full">
+        <Button onClick={handleValidate} disabled={!selectedShippingId || !selectedCompanyId} className="w-full">
           Validate Quote
         </Button>
       </CardContent>

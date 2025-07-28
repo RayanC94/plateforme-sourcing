@@ -12,7 +12,7 @@ export default async function ArchiveTrackingPage() {
 
   const { data: quoteGroups, error } = await supabase
     .from('quote_groups')
-    .select(`*, entreprises (nom_entreprise)`)
+    .select(`*, entreprises (id, nom_entreprise, address, country, business_registration)`)
     .eq('status', 'Archivé');
 
   if (error) {

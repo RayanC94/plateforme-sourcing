@@ -11,7 +11,11 @@ export default async function EntreprisePage({ params: { id: entrepriseId } }: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: entreprise } = await supabase.from('entreprises').select('nom_entreprise').eq('id', entrepriseId).single();
+  const { data: entreprise } = await supabase
+    .from('entreprises')
+    .select('nom_entreprise, address, country, business_registration')
+    .eq('id', entrepriseId)
+    .single();
   const { data: quoteGroups } = await supabase.from('quote_groups').select('id, nom_groupe, status, created_at').eq('id_entreprise', entrepriseId).order('created_at', { ascending: false });
 
   if (!entreprise) { return <div>Entreprise non trouvée.</div>; }

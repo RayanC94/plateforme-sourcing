@@ -55,8 +55,7 @@ serve(async (req)=>{
         </head>
         <body>
           <div class="header"><h1>COMMERCIAL INVOICE</h1><h2>Invoice No: ${invoice.numero_facture || 'N/A'}</h2></div>
-          <div class="company-info"><div class="company-box"><h3>SELLER:</h3><strong>${seller?.company_name || 'N/A'}</strong><br>${seller?.address || ''}<br>${seller?.phone_number || ''}</div><div class="company-box"><h3>BUYER:</h3><strong>${buyer?.nom_entreprise || 'N/A'}</strong><br>${buyer?.address || ''}</div></div>
-          <table>
+          <div class="company-info"><div class="company-box"><h3>SELLER:</h3><strong>${seller?.company_name || 'N/A'}</strong><br>${seller?.address || ''}<br>${seller?.phone_number || ''}</div><div class="company-box"><h3>BUYER:</h3><strong>${buyer?.nom_entreprise || 'N/A'}</strong><br>${buyer?.address || ''}<br>${buyer?.business_registration || ''}</div></div>          <table>
             <thead><tr><th>Product</th><th>Specification</th><th>Qty</th><th class="text-right">Unit Price</th><th class="text-right">Total</th></tr></thead>
             <tbody>
               ${requests.map((req)=>{

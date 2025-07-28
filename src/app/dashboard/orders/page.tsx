@@ -11,7 +11,7 @@ export default async function OrdersPage() {
 
   const { data: quoteGroups } = await supabase
     .from('quote_groups')
-    .select(`*, entreprises(nom_entreprise), invoices(status)`)
+    .select(`*, entreprises(id, nom_entreprise, address, country, business_registration), invoices(status)`)
     .eq('id_client_session', user.id)
     .in('status', ['En production', 'Expédié', 'En transit', 'Livré']);
 

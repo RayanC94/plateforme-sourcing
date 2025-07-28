@@ -14,7 +14,7 @@ export default async function AgentTrackingPage() {
     .from('quote_groups')
     .select(`
       *,
-      entreprises (nom_entreprise)
+      entreprises (id, nom_entreprise, address, country, business_registration)
     `)
     .in('status', ['En production', 'Expédié', 'En transit', 'Livré']);
 
