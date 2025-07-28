@@ -12,6 +12,12 @@ serve(async (req)=>{
     const { invoiceId } = await req.json();
     const authHeader = req.headers.get('Authorization');
     // Initialize the Supabase client with the user's authorization header.
+    if (!authHeader) {
+      return new Response('Unauthorized', {
+        status: 401,
+        headers: corsHeaders,
+      });
+    }
     const supabase = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_ANON_KEY') ?? '', {
       global: {
         headers: {
