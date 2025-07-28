@@ -45,13 +45,14 @@ export default function UpdateInvoiceStatus({ invoice }: { invoice: Invoice }) {
       const { data: invoiceData } = await supabase.from('invoices').select('id_groupe_devis').eq('id', invoice.id).single();
       if (invoiceData) {
         // If payment is made, start production. If reverted, reset tracking.
-        const newTrackingStatus = (newStatus === statusOptions.DOWN_PAYMENT || newStatus === statusOptions.PAID)
-          ? 'In Production'
-          : 'Awaiting Payment';
+        const newGroupStatus = (newStatus === statusOptions.DOWN_PAYMENT || newStatus === statusOptions.PAID)
+      
+          ? 'En production'
+          : 'Facturé';
         
         await supabase
           .from('quote_groups')
-          .update({ tracking_status: newTrackingStatus })
+          .update({ status: newGroupStatus })
           .eq('id', invoiceData.id_groupe_devis);
       }
     }
