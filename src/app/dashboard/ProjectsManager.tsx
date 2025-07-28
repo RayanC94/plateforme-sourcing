@@ -7,33 +7,29 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 
-// Types for enterprises, projects and session
-type Entreprise = { id: string; nom_entreprise: string };
+// Types for projects and session
 type Project = { id: string; nom_groupe: string; entreprises: { nom_entreprise: string } | null };
 type Session = { user: { id: string } };
 
 interface ProjectsManagerProps {
-  entreprises: Entreprise[];
   projects: Project[];
   session: Session;
 }
 
-export default function ProjectsManager({ entreprises, projects, session }: ProjectsManagerProps) {
+export default function ProjectsManager({ projects, session }: ProjectsManagerProps) {
   const [newProjectName, setNewProjectName] = useState('');
-  const [selectedEntreprise, setSelectedEntreprise] = useState<string | null>(entreprises[0]?.id || null);
   const supabase = createClientComponentClient();
   const router = useRouter();
 
   const handleAddProject = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!newProjectName.trim() || !selectedEntreprise) return;
+    if (!newProjectName.trim()) return;
 
     const { error } = await supabase.from('quote_groups').insert({
       nom_groupe: newProjectName,
       id_client_session: session.user.id,
-      id_entreprise: selectedEntreprise,
+      id_entreprise: null, // désassociation entreprise
       cree_par_id: session.user.id,
     });
 
@@ -49,7 +45,7 @@ export default function ProjectsManager({ entreprises, projects, session }: Proj
     <Card className="mt-6">
       <CardHeader>
         <CardTitle>Gérer les Projets</CardTitle>
-        <CardDescription>Créez des projets et associez-les à vos entreprises.</CardDescription>
+        <CardDescription>Créez des projets sans les associer à une entreprise.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleAddProject} className="flex flex-col sm:flex-row items-center gap-2">
@@ -59,18 +55,6 @@ export default function ProjectsManager({ entreprises, projects, session }: Proj
             onChange={(e) => setNewProjectName(e.target.value)}
             className="flex-1"
           />
-          <Select value={selectedEntreprise || ''} onValueChange={setSelectedEntreprise}>
-            <SelectTrigger className="sm:w-48">
-              <SelectValue placeholder="Entreprise" />
-            </SelectTrigger>
-            <SelectContent>
-              {entreprises.map((entreprise) => (
-                <SelectItem key={entreprise.id} value={entreprise.id}>
-                  {entreprise.nom_entreprise}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
           <Button type="submit">Ajouter</Button>
         </form>
 

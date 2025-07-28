@@ -7,11 +7,6 @@ export default async function Dashboard() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: entreprises } = await supabase
-    .from('entreprises')
-    .select('id, nom_entreprise, address, country, business_registration')
-    .eq('id_client_session', user.id);
-
   const { data: projects } = await supabase
     .from('quote_groups')
     .select('id, nom_groupe, entreprises!inner ( nom_entreprise )') // Utilise ! pour forcer la jointure
@@ -29,7 +24,6 @@ export default async function Dashboard() {
     <div>
       <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
       <ProjectsManager
-        entreprises={entreprises || []}
         projects={normalizedProjects}
         session={session}
       />

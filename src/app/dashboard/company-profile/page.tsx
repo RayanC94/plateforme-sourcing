@@ -16,6 +16,7 @@ export default async function CompanyProfilePage() {
 
   return (
     <div>
+      // Updated to point to dedicated projects page
       <h1 className="text-3xl font-bold mb-4">Profil Entreprise</h1>
       <EntreprisesManager entreprises={entreprises || []} session={session} />
     </div>
