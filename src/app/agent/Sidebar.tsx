@@ -2,15 +2,20 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FileText, LayoutDashboard, Truck, BadgeCheck } from 'lucide-react';
+import { FileText, LayoutDashboard, Truck, BadgeCheck, Archive } from 'lucide-react';
 import SignOutButton from '../../components/auth/SignOutButton';
+import { FaRegBuilding } from "react-icons/fa";
+
 
 const navLinks = [
   { href: '/agent/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/agent/validated-quotes', label: 'Devis Validés', icon: BadgeCheck },
+  { href: '/agent/validated-quotes', label: 'Devis à facturer', icon: BadgeCheck },
   { href: '/agent/invoices', label: 'Factures', icon: FileText },
   { href: '/agent/tracking', label: 'Suivi', icon: Truck },
-  { href: '/agent/settings', label: 'Profils Vendeur', icon: FileText },
+  { href: '/agent/tracking/archive', label: 'Archives', icon: Archive },
+  { href: '/agent/settings', label: 'Entreprise', icon: FaRegBuilding },
+
+ 
 ];
 
 export default function AgentSidebar() {

@@ -19,9 +19,9 @@ type Invoice = {
 
 // English status options
 const statusOptions = {
-  PENDING: 'Pending Payment',
-  DOWN_PAYMENT: 'Down Payment',
-  PAID: 'Paid',
+    PENDING: 'En attente de paiement',
+    DOWN_PAYMENT: 'Acompte',
+    PAID: 'Payée',
 };
 
 export default function UpdateInvoiceStatus({ invoice }: { invoice: Invoice }) {
@@ -75,12 +75,12 @@ export default function UpdateInvoiceStatus({ invoice }: { invoice: Invoice }) {
       <Badge variant={getBadgeVariant(status)} className="min-w-[150px] text-center justify-center">{status}</Badge>
       <Select onValueChange={handleStatusChange} defaultValue={status} disabled={isLoading}>
         <SelectTrigger className="min-w-[180px]">
-          <SelectValue placeholder="Change status" />
+         <SelectValue placeholder="Changer le statut" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={statusOptions.PENDING}>Pending Payment</SelectItem>
-          <SelectItem value={statusOptions.DOWN_PAYMENT}>Down Payment</SelectItem>
-          <SelectItem value={statusOptions.PAID}>Paid</SelectItem>
+        <SelectItem value={statusOptions.PENDING}>En attente de paiement</SelectItem>
+          <SelectItem value={statusOptions.DOWN_PAYMENT}>Acompte</SelectItem>
+          <SelectItem value={statusOptions.PAID}>Payée</SelectItem>
         </SelectContent>
       </Select>
     </div>

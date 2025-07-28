@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import UpdateInvoiceStatus from './UpdateInvoiceStatus';
+import DownloadInvoiceButton from '@/app/dashboard/invoices/DownloadInvoiceButton';
 
 export default async function AgentInvoicesPage() {
   const supabase = createClient();
@@ -24,6 +25,7 @@ export default async function AgentInvoicesPage() {
                 <TableHead>Groupe</TableHead>
                 <TableHead>Montant</TableHead>
                 <TableHead>Statut du Paiement</TableHead>
+                <TableHead>Télécharger</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -34,6 +36,9 @@ export default async function AgentInvoicesPage() {
                   <TableCell>${invoice.montant_total.toFixed(2)}</TableCell>
                   <TableCell>
                     <UpdateInvoiceStatus invoice={invoice} />
+                  </TableCell>
+                  <TableCell>
+                    <DownloadInvoiceButton invoiceId={invoice.id} invoiceNumber={invoice.numero_facture} />
                   </TableCell>
                 </TableRow>
               ))}

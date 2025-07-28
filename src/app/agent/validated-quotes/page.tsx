@@ -9,10 +9,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import SignOutButton from '../../../components/auth/SignOutButton';
 import GenerateInvoiceDialog from './GenerateInvoiceDialog';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+
 
 export default async function ValidatedQuotesPage() {
   const supabase = createClient();
@@ -54,25 +52,14 @@ export default async function ValidatedQuotesPage() {
 
   return (
     <div className="container mx-auto p-4">
-      <header className="flex justify-between items-center mb-6">
-        <div>
+      <header className="mb-6">
+        <h1 className="text-2xl font-bold">Devis à facturer</h1>
           <h1 className="text-2xl font-bold">Validated Quotes</h1>
-          <p className="text-gray-500">Generate invoices for approved quotes.</p>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link href="/agent/dashboard">
-            <Button variant="outline">Dashboard</Button>
-          </Link>
-          {/* LIEN AJOUTÉ */}
-          <Link href="/agent/invoices">
-            <Button variant="outline">Invoices</Button>
-          </Link>
-          <SignOutButton />
-        </div>
+        <p className="text-gray-500">Generate invoices for approved quotes.</p>
       </header>
 
       <Card>
-        <CardHeader><CardTitle>Ready for Invoicing</CardTitle></CardHeader>
+       <CardHeader><CardTitle>Devis à facturer</CardTitle></CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
