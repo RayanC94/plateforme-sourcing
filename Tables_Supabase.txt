@@ -1,0 +1,107 @@
+
+TABLE entreprises (
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMPTZ NOT NULL,
+    nom_entreprise TEXT NOT NULL,
+    id_client_session UUID NOT NULL,
+    address TEXT,
+    country TEXT,
+    business_registration TEXT
+);
+
+TABLE invoices (
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMPTZ NOT NULL,
+    id_groupe_devis UUID NOT NULL,
+    numero_facture TEXT,
+    montant_total NUMERIC NOT NULL,
+    status TEXT NOT NULL,
+    date_emission DATE,
+    date_echeance DATE,
+    echeancier_paiements JSONB,
+    id_seller_profile UUID
+);
+
+TABLE profiles (
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMPTZ NOT NULL,
+    nom TEXT NOT NULL,
+    role TEXT NOT NULL
+);
+
+TABLE quote_groups (
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMPTZ NOT NULL,
+    nom_groupe TEXT NOT NULL,
+    id_client_session UUID NOT NULL,
+    status TEXT NOT NULL,
+    cree_par_id UUID NOT NULL,
+    methode_transport_choisie TEXT,
+    cout_transport_estime NUMERIC,
+    incoterm TEXT,
+    id_entreprise UUID NOT NULL,
+    tracking_status TEXT NOT NULL,
+    billing_company_id UUID NOT NULL
+);
+
+TABLE quote_requests (
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMPTZ NOT NULL,
+    id_groupe_devis UUID NOT NULL,
+    nom_produit TEXT NOT NULL,
+    quantite INTEGER NOT NULL,
+    photo_url TEXT NOT NULL,
+    poids_estime_unitaire_kg NUMERIC,
+    volume_estime_unitaire_m3 NUMERIC,
+    details_logistiques TEXT,
+    details TEXT
+);
+
+TABLE seller_profiles (
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMPTZ,
+    company_name TEXT,
+    address TEXT,
+    business_registration TEXT,
+    phone_number TEXT,
+    website_url TEXT,
+    email TEXT,
+    beneficiary_name TEXT,
+    beneficiary_account TEXT,
+    beneficiary_address TEXT,
+    bank_name TEXT,
+    bank_address TEXT,
+    swift_code TEXT,
+    bank_code TEXT,
+    branch_code TEXT,
+    country_region TEXT,
+    stamp_url TEXT
+);
+
+TABLE shipping_formulas (
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMPTZ,
+    methode TEXT,
+    type_calcul TEXT,
+    prix_par_unite NUMERIC,
+    frais_fixes NUMERIC,
+    incoterm_associe TEXT
+);
+
+TABLE supplier_offers (
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMPTZ,
+    id_demande_devis UUID,
+    id_agent UUID,
+    nom_fournisseur TEXT,
+    devise TEXT,
+    details_qualite TEXT,
+    est_visible_client BOOLEAN,
+    photo_url_fournisseur TEXT,
+    product_specification TEXT,
+    packing TEXT,
+    prix_unitaire_rmb NUMERIC,
+    remark TEXT,
+    client_currency TEXT,
+    exchange_rate NUMERIC
+);
