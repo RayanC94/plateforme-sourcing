@@ -13,7 +13,7 @@ type QuoteRequest = {
   nom_produit: string;
   quantite: number;
   details?: string;
-  photo_url: string;
+  photo_url: string | null;
 };
 
 export default function QuoteRequestActions({ request }: { request: QuoteRequest }) {

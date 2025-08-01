@@ -7,16 +7,11 @@ export default async function ProjectsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: projects } = await supabase
+  const { data: groups } = await supabase
     .from('quote_groups')
-    .select('id, nom_groupe, entreprises!inner ( nom_entreprise )')
+    .select('id, nom_groupe, quote_requests ( id, nom_produit, quantite, photo_url )')
     .eq('id_client_session', user.id)
     .order('created_at', { ascending: false });
-
-  const normalizedProjects = (projects || []).map((p) => ({
-    ...p,
-    entreprises: p.entreprises?.[0] || { nom_entreprise: 'Inconnu' }
-  }));
 
   const session = { user };
 
@@ -24,7 +19,7 @@ export default async function ProjectsPage() {
     <div>
       <h1 className="text-3xl font-bold mb-4">Projets</h1>
       <ProjectsManager
-        projects={normalizedProjects}
+        projects={groups || []}
         session={session}
       />
     </div>

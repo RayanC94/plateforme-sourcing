@@ -9,9 +9,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import CreateQuoteRequest from './CreateQuoteRequest';
+import CreateQuoteRequest from '@/components/quote-requests/CreateQuoteRequest';
 import QuoteSummary from './QuoteSummary';
-import QuoteRequestActions from './QuoteRequestActions';
+import QuoteRequestActions from '@/components/quote-requests/QuoteRequestActions';
 import ImageLightbox from '@/components/ui/ImageLightbox'; // Using the alias for a cleaner import
 
 export default async function GroupePage({ params: { id: groupId } }: { params: { id: string } }) {

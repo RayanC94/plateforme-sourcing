@@ -16,7 +16,7 @@ type QuoteRequest = {
   nom_produit: string;
   quantite: number;
   details?: string;
-  photo_url: string;
+  photo_url: string | null;
 };
 
 export default function EditQuoteRequest({ request }: { request: QuoteRequest }) {
@@ -30,7 +30,7 @@ export default function EditQuoteRequest({ request }: { request: QuoteRequest })
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    let updatedPhotoUrl = request.photo_url;
+    let updatedPhotoUrl = request.photo_url || '';
 
     if (newFile) {
       const fileExt = newFile.name.split('.').pop();
@@ -73,9 +73,11 @@ export default function EditQuoteRequest({ request }: { request: QuoteRequest })
             <Label htmlFor="details">Détails (Optionnel)</Label>
             <Textarea id="details" value={details} onChange={(e) => setDetails(e.target.value)} />
 
-            <Label htmlFor="photo">Changer la photo</Label>
-            <Image src={request.photo_url} alt="Photo actuelle" width={80} height={80} className="rounded-md object-cover my-2" />
-            <Input id="photo" type="file" onChange={(e) => setNewFile(e.target.files ? e.target.files[0] : null)} />
+              <Label htmlFor="photo">Changer la photo</Label>
+              {request.photo_url && (
+                <Image src={request.photo_url} alt="Photo actuelle" width={80} height={80} className="rounded-md object-cover my-2" />
+              )}
+              <Input id="photo" type="file" onChange={(e) => setNewFile(e.target.files ? e.target.files[0] : null)} />
           </div>
           <DialogFooter>
             <Button type="submit">Enregistrer</Button>
