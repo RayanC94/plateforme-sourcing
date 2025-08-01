@@ -4,7 +4,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2 } from "lucide-react"; // Import icons
+import { Trash2 } from "lucide-react"; // Import icon
 import EditQuoteRequest from '@/components/quote-requests/EditQuoteRequest'
  
 // Type for the request prop

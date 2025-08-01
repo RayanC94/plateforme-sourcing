@@ -12,7 +12,7 @@ import CreateQuoteRequest from '@/components/quote-requests/CreateQuoteRequest';
 import ImageLightbox from '@/components/ui/ImageLightbox';
 
 // Types for projects and session
-type QuoteRequest = { id: string; nom_produit: string; quantite: number; photo_url: string | null };
+type QuoteRequest = { id: string; nom_produit: string; quantite: number; photo_url: string };
 type Project = { id: string; nom_groupe: string; quote_requests: QuoteRequest[] };
 type Session = { user: { id: string } };
 
