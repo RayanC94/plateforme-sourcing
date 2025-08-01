@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea'; // Assurez-vous que c'est importé
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
-export default function CreateQuoteRequest({ groupId }: { groupId: string }) {
+export default function CreateQuoteRequest({ groupId }: { groupId?: string | null }) {
   const [open, setOpen] = useState(false);
   const [productName, setProductName] = useState('');
   const [quantity, setQuantity] = useState('');
@@ -40,7 +40,7 @@ export default function CreateQuoteRequest({ groupId }: { groupId: string }) {
     const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(fileName);
 
     const { error: insertError } = await supabase.from('quote_requests').insert({
-      id_groupe_devis: groupId,
+      id_groupe_devis: groupId || null,
       nom_produit: productName,
       quantite: parseInt(quantity, 10),
       photo_url: publicUrl,

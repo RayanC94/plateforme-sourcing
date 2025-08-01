@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Pencil, Trash2 } from "lucide-react"; // Import icons
-import EditQuoteRequest from './EditQuoteRequest';
-
+import EditQuoteRequest from '@/components/quote-requests/EditQuoteRequest'
+ 
 // Type for the request prop
 type QuoteRequest = {
   id: string;
