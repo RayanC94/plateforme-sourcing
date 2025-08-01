@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import DashboardDnD from './DashboardDnD';
+import { SelectionProvider } from '@/components/selection/SelectionContext';
+import ActionSidebar from '@/components/selection/ActionSidebar';
 
 export default async function Dashboard() {
   const supabase = createClient();
@@ -22,10 +24,17 @@ export default async function Dashboard() {
   const session = { user };
 
   return (
-    <DashboardDnD
-      groups={groups || []}
-      ungroupedRequests={ungroupedRequests || []}
-      session={session}
-    />
+    <SelectionProvider>
+      <div className="flex">
+        <div className="flex-1">
+          <DashboardDnD
+            groups={groups || []}
+            ungroupedRequests={ungroupedRequests || []}
+            session={session}
+          />
+        </div>
+        <ActionSidebar />
+      </div>
+    </SelectionProvider>
   );
 }

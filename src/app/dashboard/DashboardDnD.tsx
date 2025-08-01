@@ -8,7 +8,7 @@ import CreateQuoteRequest from '@/components/quote-requests/CreateQuoteRequest';
 import DraggableQuoteRequest from '@/components/quote-requests/DraggableQuoteRequest';
 import ProjectsManager from './ProjectsManager';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 type QuoteRequest = {
   id: string;
@@ -40,8 +40,13 @@ export default function DashboardDnD({ groups, ungroupedRequests, session }: Das
     const { active, over } = event;
     if (!over) return;
     const requestId = String(active.id);
-    const overId = String(over.id);
-    const newGroupId = overId.startsWith('group-') ? overId.replace('group-', '') : null;
+    // When dropping over an item, `over.id` corresponds to the item's id.
+    // `containerId` points to the droppable container containing the item.
+    const overContainerId =
+      over.data?.current?.sortable?.containerId ?? String(over.id);
+    const newGroupId = overContainerId.startsWith('group-')
+      ? overContainerId.replace('group-', '')
+      : null;
     const { error } = await supabase
       .from('quote_requests')
       .update({ id_groupe_devis: newGroupId })
@@ -72,6 +77,7 @@ export default function DashboardDnD({ groups, ungroupedRequests, session }: Das
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-4"></TableHead>
                       <TableHead>Photo</TableHead>
                       <TableHead>Produit</TableHead>
                       <TableHead>Qté</TableHead>

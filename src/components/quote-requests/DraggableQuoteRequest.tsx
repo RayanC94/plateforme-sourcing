@@ -5,6 +5,7 @@ import { CSS } from '@dnd-kit/utilities';
 import ImageLightbox from '@/components/ui/ImageLightbox';
 import QuoteRequestActions from './QuoteRequestActions';
 import { TableRow, TableCell } from '@/components/ui/table';
+import { useSelection } from '../selection/SelectionContext';
 
 type QuoteRequest = {
   id: string;
@@ -19,6 +20,7 @@ interface DraggableQuoteRequestProps {
 
 export default function DraggableQuoteRequest({ request }: DraggableQuoteRequestProps) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: request.id });
+  const { selectedRequests, toggleRequest } = useSelection();
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -27,6 +29,14 @@ export default function DraggableQuoteRequest({ request }: DraggableQuoteRequest
 
   return (
     <TableRow ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <TableCell>
+        <input
+          type="checkbox"
+          checked={selectedRequests.includes(request.id)}
+          onChange={() => toggleRequest(request.id)}
+          onClick={(e) => e.stopPropagation()}
+        />
+      </TableCell>
       <TableCell>
         {request.photo_url && (
           <ImageLightbox src={request.photo_url} alt={request.nom_produit} />

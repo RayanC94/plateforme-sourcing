@@ -6,11 +6,12 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import CreateQuoteRequest from '@/components/quote-requests/CreateQuoteRequest';
 import DraggableQuoteRequest from '@/components/quote-requests/DraggableQuoteRequest';
 import { SortableContext } from '@dnd-kit/sortable';
 import { useDroppable } from '@dnd-kit/core';
+import { useSelection } from '@/components/selection/SelectionContext';
 
 // Types for projects and session
 type QuoteRequest = { id: string; nom_produit: string; quantite: number; photo_url: string | null };
@@ -71,9 +72,9 @@ export default function ProjectsManager({ projects, session }: ProjectsManagerPr
                 <ProjectGroup key={project.id} project={project} />
               ))}
             </div>
-          ) : (
-            <p className="text-sm text-gray-500 mt-2">Vous n'avez pas encore créé de projet.</p>
-          )}
+            ) : (
+              <p className="text-sm text-gray-500 mt-2">Vous n&apos;avez pas encore créé de projet.</p>
+            )}
         </div>
       </CardContent>
     </Card>
@@ -82,10 +83,17 @@ export default function ProjectsManager({ projects, session }: ProjectsManagerPr
 
 function ProjectGroup({ project }: { project: Project }) {
   const { setNodeRef } = useDroppable({ id: `group-${project.id}` });
+  const { selectedGroups, toggleGroup } = useSelection();
 
   return (
     <details className="border rounded">
-      <summary className="cursor-pointer select-none p-2 font-medium">
+      <summary className="cursor-pointer select-none p-2 font-medium flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={selectedGroups.includes(project.id)}
+          onChange={() => toggleGroup(project.id)}
+          onClick={(e) => e.stopPropagation()}
+        />
         {project.nom_groupe}
       </summary>
       <div className="p-2">
@@ -96,6 +104,7 @@ function ProjectGroup({ project }: { project: Project }) {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-4"></TableHead>
                 <TableHead>Photo</TableHead>
                 <TableHead>Produit</TableHead>
                 <TableHead>Qté</TableHead>
