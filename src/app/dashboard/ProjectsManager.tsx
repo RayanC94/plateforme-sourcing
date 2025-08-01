@@ -3,13 +3,17 @@
 import { useState } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import QuoteRequestActions from '@/components/quote-requests/QuoteRequestActions';
+import CreateQuoteRequest from '@/components/quote-requests/CreateQuoteRequest';
+import ImageLightbox from '@/components/ui/ImageLightbox';
 
 // Types for projects and session
-type Project = { id: string; nom_groupe: string; entreprises: { nom_entreprise: string } | null };
+type QuoteRequest = { id: string; nom_produit: string; quantite: number; photo_url: string | null };
+type Project = { id: string; nom_groupe: string; quote_requests: QuoteRequest[] };
 type Session = { user: { id: string } };
 
 interface ProjectsManagerProps {
@@ -61,15 +65,49 @@ export default function ProjectsManager({ projects, session }: ProjectsManagerPr
         <div className="mt-4">
           <h3 className="font-semibold">Vos projets :</h3>
           {projects.length > 0 ? (
-            <ul className="list-disc pl-5 mt-2 space-y-1">
+            <div className="space-y-4 mt-2">
               {projects.map((project) => (
-                <li key={project.id}>
-                  <Link href={`/dashboard/groupe/${project.id}`} className="text-blue-600 hover:underline">
-                    {project.nom_groupe} ({project.entreprises?.nom_entreprise || 'Sans entreprise'})
-                  </Link>
-                </li>
+                <details key={project.id} className="border rounded">
+                  <summary className="cursor-pointer select-none p-2 font-medium">
+                    {project.nom_groupe}
+                  </summary>
+                  <div className="p-2">
+                    <div className="flex justify-end mb-2">
+                      <CreateQuoteRequest groupId={project.id} />
+                    </div>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Photo</TableHead>
+                          <TableHead>Produit</TableHead>
+                          <TableHead>Qté</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {project.quote_requests && project.quote_requests.map((request) => (
+                          <TableRow key={request.id}>
+                            <TableCell>
+                              {request.photo_url && (
+                                <ImageLightbox src={request.photo_url} alt={request.nom_produit} />
+                              )}
+                            </TableCell>
+                            <TableCell className="font-medium">{request.nom_produit}</TableCell>
+                            <TableCell>{request.quantite}</TableCell>
+                            <TableCell className="text-right">
+                              <QuoteRequestActions request={request} />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                    {(project.quote_requests?.length ?? 0) === 0 && (
+                      <p className="text-sm text-gray-500 py-4 text-center">Aucune demande.</p>
+                    )}
+                  </div>
+                </details>
               ))}
-            </ul>
+            </div>
           ) : (
             <p className="text-sm text-gray-500 mt-2">Vous n'avez pas encore créé de projet.</p>
           )}
