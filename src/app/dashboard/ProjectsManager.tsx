@@ -7,12 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import QuoteRequestActions from '@/components/quote-requests/QuoteRequestActions';
 import CreateQuoteRequest from '@/components/quote-requests/CreateQuoteRequest';
-import ImageLightbox from '@/components/ui/ImageLightbox';
+import DraggableQuoteRequest from '@/components/quote-requests/DraggableQuoteRequest';
+import { SortableContext } from '@dnd-kit/sortable';
+import { useDroppable } from '@dnd-kit/core';
 
 // Types for projects and session
-type QuoteRequest = { id: string; nom_produit: string; quantite: number; photo_url: string };
+type QuoteRequest = { id: string; nom_produit: string; quantite: number; photo_url: string | null };
 type Project = { id: string; nom_groupe: string; quote_requests: QuoteRequest[] };
 type Session = { user: { id: string } };
 
@@ -67,45 +68,7 @@ export default function ProjectsManager({ projects, session }: ProjectsManagerPr
           {projects.length > 0 ? (
             <div className="space-y-4 mt-2">
               {projects.map((project) => (
-                <details key={project.id} className="border rounded">
-                  <summary className="cursor-pointer select-none p-2 font-medium">
-                    {project.nom_groupe}
-                  </summary>
-                  <div className="p-2">
-                    <div className="flex justify-end mb-2">
-                      <CreateQuoteRequest groupId={project.id} />
-                    </div>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Photo</TableHead>
-                          <TableHead>Produit</TableHead>
-                          <TableHead>Qté</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {project.quote_requests && project.quote_requests.map((request) => (
-                          <TableRow key={request.id}>
-                            <TableCell>
-                              {request.photo_url && (
-                                <ImageLightbox src={request.photo_url} alt={request.nom_produit} />
-                              )}
-                            </TableCell>
-                            <TableCell className="font-medium">{request.nom_produit}</TableCell>
-                            <TableCell>{request.quantite}</TableCell>
-                            <TableCell className="text-right">
-                              <QuoteRequestActions request={request} />
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                    {(project.quote_requests?.length ?? 0) === 0 && (
-                      <p className="text-sm text-gray-500 py-4 text-center">Aucune demande.</p>
-                    )}
-                  </div>
-                </details>
+                <ProjectGroup key={project.id} project={project} />
               ))}
             </div>
           ) : (
@@ -114,5 +77,42 @@ export default function ProjectsManager({ projects, session }: ProjectsManagerPr
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function ProjectGroup({ project }: { project: Project }) {
+  const { setNodeRef } = useDroppable({ id: `group-${project.id}` });
+
+  return (
+    <details className="border rounded">
+      <summary className="cursor-pointer select-none p-2 font-medium">
+        {project.nom_groupe}
+      </summary>
+      <div className="p-2">
+        <div className="flex justify-end mb-2">
+          <CreateQuoteRequest groupId={project.id} />
+        </div>
+        <SortableContext id={`group-${project.id}`} items={project.quote_requests?.map((r) => r.id) || []}>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Photo</TableHead>
+                <TableHead>Produit</TableHead>
+                <TableHead>Qté</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody ref={setNodeRef}>
+              {project.quote_requests && project.quote_requests.map((request) => (
+                <DraggableQuoteRequest key={request.id} request={request} />
+              ))}
+            </TableBody>
+          </Table>
+        </SortableContext>
+        {(project.quote_requests?.length ?? 0) === 0 && (
+          <p className="text-sm text-gray-500 py-4 text-center">Aucune demande.</p>
+        )}
+      </div>
+    </details>
   );
 }

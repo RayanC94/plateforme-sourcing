@@ -1,11 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import ProjectsManager from './ProjectsManager';
-import CreateQuoteRequest from '@/components/quote-requests/CreateQuoteRequest';
-import QuoteRequestActions from '@/components/quote-requests/QuoteRequestActions';
-import ImageLightbox from '@/components/ui/ImageLightbox';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import DashboardDnD from './DashboardDnD';
 
 export default async function Dashboard() {
   const supabase = createClient();
@@ -27,56 +22,10 @@ export default async function Dashboard() {
   const session = { user };
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
-
-      <section className="mb-8">
-        <header className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold">Requêtes seules</h2>
-          <CreateQuoteRequest />
-        </header>
-        <Card>
-          <CardHeader>
-            <CardTitle>Demandes de Devis</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Photo</TableHead>
-                  <TableHead>Produit</TableHead>
-                  <TableHead>Qté</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {ungroupedRequests && ungroupedRequests.map((request) => (
-                  <TableRow key={request.id}>
-                    <TableCell>
-                      {request.photo_url && (
-                        <ImageLightbox src={request.photo_url} alt={request.nom_produit} />
-                      )}
-                    </TableCell>
-                    <TableCell className="font-medium">{request.nom_produit}</TableCell>
-                    <TableCell>{request.quantite}</TableCell>
-                    <TableCell className="text-right">
-                      <QuoteRequestActions request={request} />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            {(!ungroupedRequests || ungroupedRequests.length === 0) && (
-              <p className="text-center text-gray-500 py-4">Aucune demande libre.</p>
-            )}
-          </CardContent>
-        </Card>
-      </section>
-
-      <ProjectsManager
-        projects={groups || []}
-        session={session}
-      />
-    </div>
+    <DashboardDnD
+      groups={groups || []}
+      ungroupedRequests={ungroupedRequests || []}
+      session={session}
+    />
   );
 }
